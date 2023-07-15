@@ -26,6 +26,11 @@ public class RecipeService {
     }
 
     public ResponseEntity<String> createZzim(Long id, Long userId) {
+        // 검증을 추가(이미 찜한 상태인지 확인)
+        if(zzimRepository.existsByRecipeIdAndUserId(id, userId)){
+            throw new IllegalArgumentException("잘못된 접근입니다.");
+        }
+
         Recipe recipe = findRecipeById(id);
         Zzim zzim = new Zzim(recipe, userId);
         zzimRepository.save(zzim);
