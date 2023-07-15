@@ -2,13 +2,16 @@ package com.alttalttal.mini_project.entity;
 
 import com.alttalttal.mini_project.dto.RecipeRequestDto;
 import com.alttalttal.mini_project.recipe_component.Ingredient;
+import com.alttalttal.mini_project.recipe_component.MakingDetail;
 import jakarta.persistence.*;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Entity
 @Table(name = "recipe")
+@Getter
 @NoArgsConstructor
 public class Recipe {
     @Id
@@ -20,17 +23,19 @@ public class Recipe {
     private String base;
     @Column(name = "explanation", nullable = false)
     private String explanation;
+    // {"name":"재료명", "amount":"재료양"}
     @ElementCollection(fetch = FetchType.EAGER)
-    private List<Ingredient> ingredientList;
-    @Column(name = "recipe", nullable = false)
-    private String recipe;
+    private List<Ingredient> IngredientList;
+    // {"Making":"칵테일 제조 과정"}
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<MakingDetail> makingDetailList;
+    @OneToMany(mappedBy = "recipe")
+    private List<Zzim> zzim;
 
     public Recipe (RecipeRequestDto requestDto){
         this.name = requestDto.getName();
         this.base = requestDto.getBase();
         this.explanation = requestDto.getExplanation();
-        this.ingredientList = requestDto.getIngredient();
-        this.recipe = requestDto.getRecipe();
+        this.IngredientList = requestDto.getIngredient();
     }
-
 }
