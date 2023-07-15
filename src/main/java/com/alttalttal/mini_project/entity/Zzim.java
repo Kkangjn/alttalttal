@@ -19,4 +19,9 @@ public class Zzim {
     private Recipe recipe;
     @Column
     private Long userId;
+
+    public Zzim(Recipe recipe, Long userId) {
+        this.recipe = recipe;
+        this.userId = userId;
+    }
 }

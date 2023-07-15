@@ -2,14 +2,18 @@ package com.alttalttal.mini_project.service;
 
 import com.alttalttal.mini_project.dto.RecipeResponseDto;
 import com.alttalttal.mini_project.entity.Recipe;
+import com.alttalttal.mini_project.entity.Zzim;
 import com.alttalttal.mini_project.repository.RecipeRepository;
+import com.alttalttal.mini_project.repository.ZzimRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class RecipeService {
     private final RecipeRepository recipeRepository;
+    private final ZzimRepository zzimRepository;
     public RecipeResponseDto getRecipe(Long id, Long userId) {
         Recipe recipe = findRecipeById(id);
         // 유저가 찜 했는지 확인
@@ -18,6 +22,13 @@ public class RecipeService {
         Integer countZzim = recipe.getZzim().size();
 
         return new RecipeResponseDto(recipe, isUserZzim, countZzim);
+    }
+
+    public ResponseEntity<String> createZzim(Long id, Long userId) {
+        Recipe recipe = findRecipeById(id);
+        Zzim zzim = new Zzim(recipe, userId);
+        zzimRepository.save(zzim);
+        return ResponseEntity.ok("찜 성공");
     }
 
     private Recipe findRecipeById(Long id){
