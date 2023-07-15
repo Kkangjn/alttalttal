@@ -1,6 +1,7 @@
 package com.alttalttal.mini_project.dto;
 
 import com.alttalttal.mini_project.recipe_component.Ingredient;
+import com.alttalttal.mini_project.recipe_component.MakingDetail;
 import lombok.Getter;
 
 import java.util.List;
@@ -11,6 +12,6 @@ public class RecipeRequestDto {
     private String name;
     private String base;
     private String explanation;
-    private List<Ingredient> ingredient;
-    private String recipe;
+    private List<Ingredient> ingredients;
+    private List<MakingDetail> makingDetails;
 }

@@ -20,4 +20,9 @@ public class RecipeController {
     public ResponseEntity<String> createZzim(@PathVariable Long id){
         return recipeService.createZzim(id, userId);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteZzim(@PathVariable Long id){
+        return recipeService.deleteZzim(id, userId);
+    }
 }

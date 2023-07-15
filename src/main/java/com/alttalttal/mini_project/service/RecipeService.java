@@ -5,6 +5,7 @@ import com.alttalttal.mini_project.entity.Recipe;
 import com.alttalttal.mini_project.entity.Zzim;
 import com.alttalttal.mini_project.repository.RecipeRepository;
 import com.alttalttal.mini_project.repository.ZzimRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,12 @@ public class RecipeService {
         Zzim zzim = new Zzim(recipe, userId);
         zzimRepository.save(zzim);
         return ResponseEntity.ok("찜 성공");
+    }
+
+    @Transactional // 쿼리메서드를 사용해서 Transactional이 필요한건가?
+    public ResponseEntity<String> deleteZzim(Long id, Long userId) {
+        zzimRepository.deleteByUserIdAndRecipeId(id, userId); // select + delete
+        return ResponseEntity.ok("찜 삭제");
     }
 
     private Recipe findRecipeById(Long id){

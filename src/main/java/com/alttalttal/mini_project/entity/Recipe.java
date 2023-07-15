@@ -24,18 +24,21 @@ public class Recipe {
     @Column(name = "explanation", nullable = false)
     private String explanation;
     // {"name":"재료명", "amount":"재료양"}
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(targetClass = Ingredient.class,fetch = FetchType.LAZY)
     private List<Ingredient> IngredientList;
     // {"Making":"칵테일 제조 과정"}
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(targetClass = MakingDetail.class, fetch = FetchType.LAZY)
     private List<MakingDetail> makingDetailList;
-    @OneToMany(mappedBy = "recipe")
+    @OneToMany(mappedBy = "recipe",
+            cascade = CascadeType.REMOVE,
+            fetch = FetchType.LAZY)
     private List<Zzim> zzim;
 
     public Recipe (RecipeRequestDto requestDto){
         this.name = requestDto.getName();
         this.base = requestDto.getBase();
         this.explanation = requestDto.getExplanation();
-        this.IngredientList = requestDto.getIngredient();
+        this.IngredientList = requestDto.getIngredients();
+        this.makingDetailList = requestDto.getMakingDetails();
     }
 }
