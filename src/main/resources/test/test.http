@@ -1,0 +1,8 @@
+### 레시피 상세조회
+GET http://localhost:8080/recipes/1
+
+### 레시피 찜하기
+POST http://localhost:8080/recipes/1
+
+### 래시피 찜 취소
+DELETE http://localhost:8080/recipes/1
