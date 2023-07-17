@@ -1,5 +1,6 @@
 package com.alttalttal.mini_project.service;
 
+import com.alttalttal.mini_project.dto.AllRecipesResponseDto;
 import com.alttalttal.mini_project.dto.RecipeResponseDto;
 import com.alttalttal.mini_project.entity.MongoRecipe;
 import com.alttalttal.mini_project.entity.Zzim;
@@ -9,11 +10,25 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class RecipeService {
     private final ZzimRepository zzimRepository;
     private final MongoRecipeRepository mongoRecipeRepository;
+    public List<AllRecipesResponseDto> getAllRecipes() {
+        List<AllRecipesResponseDto> allRecipesResponseDtoList = new ArrayList<>();
+        List<MongoRecipe> mongoRecipeList = mongoRecipeRepository.findAll();
+        for (MongoRecipe recipe : mongoRecipeList) {
+            Integer countZzim = zzimRepository.countByRecipeId(recipe.getRecipeId());
+            allRecipesResponseDtoList.add(new AllRecipesResponseDto(recipe, countZzim));
+        }
+        return allRecipesResponseDtoList.stream().sorted(Comparator.comparing(AllRecipesResponseDto::getCountZzim).reversed()).toList();
+    }
+
     public RecipeResponseDto getRecipe(Long recipeId, Long userId) {
         MongoRecipe recipe = mongoRecipeRepository.findByRecipeId(recipeId).orElseThrow(()-> new IllegalArgumentException("잘못된 접근 입니다."));
         // 유저가 찜 했는지 확인
