@@ -168,9 +168,7 @@ public class JwtUtil {
                     String email = getUserInfoFromToken(refreshToken).getSubject();
                     UserRoleEnum role = getRoles(email);
                     String newAccessToken = createAccessToken(email, role);
-                    String newRefreshToken = createRefreshToken(email, role);
                     addJwtToCookie(newAccessToken, ACCESS_HEADER, response);
-                    addJwtToCookie(newRefreshToken, REFRESH_HEADER, response);
                     return true;
                 }
                 return false;
