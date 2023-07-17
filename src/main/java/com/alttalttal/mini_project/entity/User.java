@@ -1,5 +1,6 @@
 package com.alttalttal.mini_project.entity;
 
+import com.alttalttal.mini_project.Dto.MypageRequestDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,7 +23,7 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String nickname;
 
     @Column(nullable = false)
@@ -34,5 +35,9 @@ public class User {
         this.password = password;
         this.nickname = nickname;
         this.role = role;
+    }
+
+    public void update(MypageRequestDto requestDto){
+        this.nickname = requestDto.getNickname();
     }
 }

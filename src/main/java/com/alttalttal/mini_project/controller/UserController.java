@@ -3,8 +3,6 @@ package com.alttalttal.mini_project.controller;
 import com.alttalttal.mini_project.dto.LoginRequestDto;
 import com.alttalttal.mini_project.dto.MessageResponseDto;
 import com.alttalttal.mini_project.dto.SignUpRequestDto;
-import com.alttalttal.mini_project.jwt.JwtUtil;
-import com.alttalttal.mini_project.service.RedisService;
 import com.alttalttal.mini_project.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,7 +21,7 @@ public class UserController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<MessageResponseDto> createUser(@RequestBody @Valid SignUpRequestDto signUpRequestDto) {
+    public ResponseEntity<MessageResponseDto> createUser(@RequestBody SignUpRequestDto signUpRequestDto) {
         return userService.createUser(signUpRequestDto);
     }
 
