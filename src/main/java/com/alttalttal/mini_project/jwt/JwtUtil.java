@@ -157,7 +157,7 @@ public class JwtUtil {
         refreshToken = substringToken(refreshToken);
 
         if(accessToken != null){ // accessToken 비어있지 않고
-            if(validateToken(accessToken) && redisService.getValue(accessToken) == null){ // 검증이 완료되고 DB에 refresh token이 만료되지 않
+            if(validateToken(accessToken) && redisService.getValue(accessToken) == null){
                 return true;
             }else if(!validateToken(accessToken) && refreshToken != null){ //검증은 안되는데 refresh 토큰이 값이 있어
                 boolean validateRefreshToken = validateToken(refreshToken); // refresh token 검증
