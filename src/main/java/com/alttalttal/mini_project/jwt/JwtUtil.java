@@ -48,11 +48,11 @@ public class JwtUtil {
     private Key key;
 
     // 토큰 유효시간
-//    public final long ACCESS_TOKEN_TIME = 60 * 30 * 1000L;
-//    public final long REFRESH_TOKEN_TIME = 60 * 60 * 24 * 30 * 1000L;
+    public final long ACCESS_TOKEN_TIME = 60 * 30 * 1000L;
+    public final long REFRESH_TOKEN_TIME = 60 * 60 * 24 * 30 * 1000L;
 
-    public final long ACCESS_TOKEN_TIME = 60 * 10 * 100L; // 1분
-    public static final long REFRESH_TOKEN_TIME = 60 * 30 * 100L; // 3분
+//    public final long ACCESS_TOKEN_TIME = 60 * 10 * 100L; // 1분
+//    public static final long REFRESH_TOKEN_TIME = 60 * 30 * 100L; // 3분
 
     // log 설정
     public static final Logger logger = LoggerFactory.getLogger("JWT 관련 로그");
@@ -156,12 +156,10 @@ public class JwtUtil {
         accessToken = substringToken(accessToken);
         refreshToken = substringToken(refreshToken);
 
-
         if(accessToken != null){ // accessToken 비어있지 않고
-            if(validateToken(accessToken)){ // 검증이 완료되면
+            if(validateToken(accessToken) && redisService.getValue(accessToken) == null){ // 검증이 완료되고 DB에 refresh token이 만료되지 않
                 return true;
             }else if(!validateToken(accessToken) && refreshToken != null){ //검증은 안되는데 refresh 토큰이 값이 있어
-                System.out.println("refreshToken = " + refreshToken);
                 boolean validateRefreshToken = validateToken(refreshToken); // refresh token 검증
                 boolean isRefreshToken = existsRefreshToken(refreshToken); // refresh token DB 존재
                 if(validateRefreshToken && isRefreshToken){
@@ -188,5 +186,16 @@ public class JwtUtil {
     // token에서 사용자 정보 가져오기
     public Claims getUserInfoFromToken(String token){
         return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+    }
+
+    public Long getExpiration(String accessToken) {
+        Date expiration = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(accessToken)
+                .getBody()
+                .getExpiration();
+        Long now = new Date().getTime();
+        return expiration.getTime() - now;
     }
 }

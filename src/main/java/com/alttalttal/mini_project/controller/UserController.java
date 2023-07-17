@@ -9,7 +9,6 @@ import com.alttalttal.mini_project.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,16 +16,13 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class UserController {
     private final UserService userService;
-    private final RedisService redisService;
-    private final JwtUtil jwtUtil;
 
-    public UserController(UserService userService, RedisService redisService, JwtUtil jwtUtil) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.redisService = redisService;
-        this.jwtUtil = jwtUtil;
+
     }
 
-    @PostMapping("/sign-up")
+    @PostMapping("/signup")
     public ResponseEntity<MessageResponseDto> createUser(@RequestBody @Valid SignUpRequestDto signUpRequestDto) {
         return userService.createUser(signUpRequestDto);
     }
@@ -38,8 +34,7 @@ public class UserController {
 
     @GetMapping("/logout")
     public ResponseEntity<MessageResponseDto> logoutUser(HttpServletRequest request){
-        redisService.delValues(jwtUtil.getTokenFromRequest("Refresh", request));
-        return new ResponseEntity<>(new MessageResponseDto("로그아웃 성공!", HttpStatus.OK.toString()), HttpStatus.OK);
+        return userService.logoutUser(request);
     }
     @GetMapping("/test")
     public void test(HttpServletRequest request, HttpServletResponse response){

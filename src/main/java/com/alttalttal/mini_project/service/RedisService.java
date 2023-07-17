@@ -13,9 +13,9 @@ public class RedisService {
 
 
     // key-value 설정
-    public void setValues(String token, String email){
+    public void setValues(String token, String email, Long expiration){
         ValueOperations<String, String> values = redisTemplate.opsForValue();
-        values.set(token, email, JwtUtil.REFRESH_TOKEN_TIME);
+        values.set(token, email, expiration);
     }
 
     // key-value 가져오기
@@ -25,8 +25,8 @@ public class RedisService {
     }
 
     // key-value 삭제
-    public void delValues(String token){
-        redisTemplate.delete(token.substring(7));
+    public boolean delValues(String token){
+       return redisTemplate.delete(token.substring(7));
     }
 
 }

@@ -16,7 +16,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
-
 import java.util.Optional;
 
 @Service
@@ -85,12 +84,28 @@ public class UserService {
         jwtUtil.addJwtToCookie(refreshToken,jwtUtil.REFRESH_HEADER, res);
 
         // Refresh Token 저장
-        redisService.setValues(jwtUtil.substringToken(refreshToken), user.getEmail());
+        redisService.setValues(jwtUtil.substringToken(refreshToken), user.getEmail(), 60 * 30 * 100L);
         return new ResponseEntity<>(new MessageResponseDto("로그인 성공!", HttpStatus.OK.toString()), HttpStatus.OK);
     }
 
     public void test(HttpServletRequest request, HttpServletResponse res) {
         if(jwtUtil.validateAllToken(request, res)) System.out.println("성공");
         else System.out.println("실패");
+    }
+
+    public ResponseEntity<MessageResponseDto> logoutUser(HttpServletRequest request) {
+        String accessToken = jwtUtil.getTokenFromRequest("Access", request);
+        String refresh = jwtUtil.getTokenFromRequest("Refresh", request);
+        Long expiration = jwtUtil.getExpiration(jwtUtil.substringToken(accessToken));
+//        String email = jwtUtil.getUserInfoFromToken(jwtUtil.substringToken(accessToken)).getSubject();
+
+        System.out.println("refresh = " + refresh);
+
+        if(!redisService.delValues(refresh)) {
+            throw new IllegalArgumentException("삭제되지 않았습니다.");
+        }
+
+        redisService.setValues(jwtUtil.substringToken(accessToken), "logout", expiration);
+        return new ResponseEntity<>(new MessageResponseDto("로그아웃 성공!", HttpStatus.OK.toString()), HttpStatus.OK);
     }
 }
