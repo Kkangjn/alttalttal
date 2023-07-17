@@ -12,6 +12,10 @@ import org.springframework.web.bind.annotation.*;
 public class RecipeController {
     private final RecipeService recipeService;
     final Long userId = 2L; // 유저 테이블이 없어서 임의로 값을 넣어줌
+    // security를 쓴다면 @AuthenticationPrincipal UserDetails userDetails
+    // userDetails.getName? getId로 처리할듯?
+
+    // 만약 로그인을 하지 않았다면 fi(userDeails == null) {userId = 0;} 으로 service로 보내서 처리할듯!
     @GetMapping("/{id}")
     public RecipeResponseDto getRecipe(@PathVariable Long id){
         return recipeService.getRecipe(id, userId);

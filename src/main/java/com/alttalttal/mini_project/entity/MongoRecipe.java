@@ -1,7 +1,7 @@
 package com.alttalttal.mini_project.entity;
 
-import com.alttalttal.mini_project.delete.recipe_component.Ingredient;
-import com.alttalttal.mini_project.delete.recipe_component.MakingDetail;
+import com.alttalttal.mini_project.entity.recipe_component.Ingredient;
+import com.alttalttal.mini_project.entity.recipe_component.MakingDetail;
 import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

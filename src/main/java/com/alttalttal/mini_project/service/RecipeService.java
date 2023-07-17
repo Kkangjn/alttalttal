@@ -1,9 +1,9 @@
 package com.alttalttal.mini_project.service;
 
 import com.alttalttal.mini_project.dto.RecipeResponseDto;
-import com.alttalttal.mini_project.entity.Recipe;
+import com.alttalttal.mini_project.entity.MongoRecipe;
 import com.alttalttal.mini_project.entity.Zzim;
-import com.alttalttal.mini_project.repository.RecipeRepository;
+import com.alttalttal.mini_project.mongo.repository.MongoRecipeRepository;
 import com.alttalttal.mini_project.repository.ZzimRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -12,41 +12,34 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class RecipeService {
-    private final RecipeRepository recipeRepository;
     private final ZzimRepository zzimRepository;
-    public RecipeResponseDto getRecipe(Long id, Long userId) {
-        Recipe recipe = findRecipeById(id);
+    private final MongoRecipeRepository mongoRecipeRepository;
+    public RecipeResponseDto getRecipe(Long recipeId, Long userId) {
+        MongoRecipe recipe = mongoRecipeRepository.findByRecipeId(recipeId).orElseThrow(()-> new IllegalArgumentException("잘못된 접근 입니다."));
         // 유저가 찜 했는지 확인
-        Boolean isUserZzim = recipe.getZzim().stream().anyMatch(zzim -> zzim.getUserId() == userId);
+        Boolean isUserZzim = zzimRepository.existsByRecipeIdAndUserId(recipeId, userId);
         // 찜한 유저수(인기 레시피를 고려해서 만듦)
-        Integer countZzim = recipe.getZzim().size();
+        Integer countZzim = zzimRepository.countByRecipeId(recipeId);
 
         return new RecipeResponseDto(recipe, isUserZzim, countZzim);
     }
 
-    public ResponseEntity<String> createZzim(Long id, Long userId) {
+    public ResponseEntity<String> createZzim(Long recipeId, Long userId) {
         // 검증을 추가(이미 찜한 상태인지 확인)
-        if(zzimRepository.existsByRecipeIdAndUserId(id, userId)){
+        if(zzimRepository.existsByRecipeIdAndUserId(recipeId, userId)){
             throw new IllegalArgumentException("잘못된 접근입니다.");
-        }
 
-        Recipe recipe = findRecipeById(id);
-        Zzim zzim = new Zzim(recipe, userId);
+        }
+        Zzim zzim = new Zzim(recipeId, userId);
         zzimRepository.save(zzim);
         return ResponseEntity.ok("찜 성공");
     }
 
-    public ResponseEntity<String> deleteZzim(Long id, Long userId) {
-        Zzim zzim = zzimRepository.findByRecipeIdAndUserId(id, userId).orElseThrow(()->
+    public ResponseEntity<String> deleteZzim(Long recipeId, Long userId) {
+        Zzim zzim = zzimRepository.findByRecipeIdAndUserId(recipeId, userId).orElseThrow(()->
                 new IllegalArgumentException("잘못된 접근입니다.")
         );
         zzimRepository.delete(zzim);
         return ResponseEntity.ok("찜 삭제");
-    }
-
-    private Recipe findRecipeById(Long id){
-        return recipeRepository.findById(id).orElseThrow(() ->
-                new IllegalArgumentException("잘못된 접근입니다.")
-        );
     }
 }

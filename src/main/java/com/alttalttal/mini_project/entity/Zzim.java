@@ -14,14 +14,13 @@ public class Zzim {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "recipe_id")
-    private Recipe recipe;
+    @Column
+    private Long recipeId;
     @Column
     private Long userId;
 
-    public Zzim(Recipe recipe, Long userId) {
-        this.recipe = recipe;
+    public Zzim(Long recipeId, Long userId) {
+        this.recipeId = recipeId;
         this.userId = userId;
     }
 }

@@ -8,4 +8,5 @@ public interface ZzimRepository extends JpaRepository<Zzim, Long> {
     Boolean existsByRecipeIdAndUserId(Long id, Long userId);
 
     Optional<Zzim> findByRecipeIdAndUserId(Long id, Long userId);
+    Integer countByRecipeId(Long recipeId);
 }
