@@ -1,7 +1,6 @@
 package com.alttalttal.mini_project.jwt;
 
 import com.alttalttal.mini_project.entity.UserRoleEnum;
-import com.alttalttal.mini_project.repository.TokenRepository;
 import com.alttalttal.mini_project.repository.UserRepository;
 import com.alttalttal.mini_project.service.RedisService;
 import io.jsonwebtoken.*;
