@@ -1,6 +1,6 @@
 package com.alttalttal.mini_project.entity;
 
-import com.alttalttal.mini_project.Dto.LoungeRequestDto;
+import com.alttalttal.mini_project.dto.LoungeRequestDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name = "lounge_table")
 @NoArgsConstructor
-public class LoungeEntity extends Time { // LoungeEntity 가 TimeEntity 를 상속받는다.
+public class LoungeEntity extends Timestamped { // LoungeEntity 가 TimeEntity 를 상속받는다.
     @Id // pk 컬럼을 지정한다. 필수.
     @GeneratedValue(strategy = GenerationType.IDENTITY) // mySQL 기준으로 auto.increment 를 할 수 있다.
     private Long id;
@@ -21,9 +21,14 @@ public class LoungeEntity extends Time { // LoungeEntity 가 TimeEntity 를 상�
     @Column(nullable = false) // 기본 Colunm이라서 default 255, 내용 빈칸 불허
     private String content;
 
-    public LoungeEntity(LoungeRequestDto loungeRequestDto) {
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    public LoungeEntity(LoungeRequestDto loungeRequestDto, User user) {
         this.base = loungeRequestDto.getBase();
         this.content = loungeRequestDto.getContent();
+        this.user = user;
     }
 
 
