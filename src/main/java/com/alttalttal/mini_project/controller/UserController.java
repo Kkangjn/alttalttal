@@ -3,7 +3,10 @@ package com.alttalttal.mini_project.controller;
 import com.alttalttal.mini_project.dto.LoginRequestDto;
 import com.alttalttal.mini_project.dto.MessageResponseDto;
 import com.alttalttal.mini_project.dto.SignUpRequestDto;
+import com.alttalttal.mini_project.dto.UserInfoResponseDto;
+import com.alttalttal.mini_project.jwt.JwtUtil;
 import com.alttalttal.mini_project.service.UserService;
+import io.jsonwebtoken.Jws;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -11,12 +14,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/users")
+@CrossOrigin(exposedHeaders = "*")
 @RestController
 public class UserController {
     private final UserService userService;
-
-    public UserController(UserService userService) {
+    private  final JwtUtil jwtUtil;
+    public UserController(UserService userService, JwtUtil jwtUtil) {
         this.userService = userService;
+        this.jwtUtil = jwtUtil;
 
     }
 
@@ -35,7 +40,12 @@ public class UserController {
         return userService.logoutUser(request);
     }
     @GetMapping("/test")
-    public void test(HttpServletRequest request, HttpServletResponse response){
-        userService.test(request, response);
+    public void test(@RequestHeader(JwtUtil.ACCESS_HEADER) String accessToken, @RequestHeader(JwtUtil.REFRESH_HEADER) String refreshToken, HttpServletResponse response){
+        userService.test(accessToken, refreshToken, response);
+    }
+
+    @GetMapping("/info")
+    public UserInfoResponseDto userInfo(HttpServletRequest request, HttpServletResponse response){
+        return userService.userInfo(request, response);
     }
 }

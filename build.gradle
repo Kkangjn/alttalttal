@@ -22,6 +22,8 @@ repositories {
 }
 
 dependencies {
+    // mongodb
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
     // Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     testImplementation group: 'it.ozimov', name: 'embedded-redis', version: '0.7.2'

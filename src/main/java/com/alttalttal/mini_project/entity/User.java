@@ -1,6 +1,6 @@
 package com.alttalttal.mini_project.entity;
 
-import com.alttalttal.mini_project.Dto.MypageRequestDto;
+import com.alttalttal.mini_project.dto.MypageRequestDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

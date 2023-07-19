@@ -1,22 +1,52 @@
 package com.alttalttal.mini_project.service;
 
-import com.alttalttal.mini_project.Dto.MypageRequestDto;
-import com.alttalttal.mini_project.Dto.MypageResponseDto;
+import com.alttalttal.mini_project.dto.MypageRequestDto;
+import com.alttalttal.mini_project.dto.MypageResponseDto;
+import com.alttalttal.mini_project.dto.simpleRecipesResponseDto;
 import com.alttalttal.mini_project.entity.User;
 import com.alttalttal.mini_project.jwt.JwtUtil;
-import com.alttalttal.mini_project.repository.UserRepository;
-import jakarta.servlet.http.HttpServletRequest;
+import com.alttalttal.mini_project.mongo.repository.MongoRecipeRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 
 @Service
 @RequiredArgsConstructor
 public class MypageService {
     private final JwtUtil jwtUtil;
-    private final UserRepository userRepository;
+    private final MongoRecipeRepository mongoRecipeRepository; // mongodb라서 연관관계 설정이 안되어있음
+    private final ServiceManagerImpl serviceManager;
+
+    // 마이페이지 조회
+    public MypageResponseDto getMypage(String accessToken, String refreshToken, HttpServletResponse response) {
+        if (!jwtUtil.validateAllToken(accessToken, refreshToken, response)) {
+            throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
+        }
+
+        User user = serviceManager.getUserFromToken(refreshToken);
+        // 유저가 찜한 레시피 목록
+        List<simpleRecipesResponseDto> simpleRecipesResponseDtoList = mongoRecipeRepository.findByZzimUserIdListUserId(user.getId()).stream().map(simpleRecipesResponseDto::new).toList();
+        return new MypageResponseDto(user, simpleRecipesResponseDtoList);
+    }
+
+    @Transactional
+    public MypageResponseDto updateMypage(MypageRequestDto mypagerequestDto, String accessToken, String refreshToken, HttpServletResponse response) {
+        // token이 유효한지 확인
+        if (!jwtUtil.validateAllToken(accessToken, refreshToken, response)) {
+            throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
+        }
+        // token에 email이 해당 이메일이 맞는지
+        User user = serviceManager.getUserFromToken(refreshToken);
+        // 맞다면 고쳐요
+        user.update(mypagerequestDto);
+        List<simpleRecipesResponseDto> simpleRecipesResponseDtoList = mongoRecipeRepository.findByZzimUserIdListUserId(user.getId()).stream().map(simpleRecipesResponseDto::new).toList();
+        return new MypageResponseDto(user, simpleRecipesResponseDtoList);
+        // return ResponseEntity.ok("변경 완료!");
+    }
 
     // 마이페이지에서 라운지 조회
 //    public List<LoungeResponseDto> getLounge() {
@@ -26,34 +56,5 @@ public class MypageService {
 //
 //    public MypageRequestDto findById(Long id) {
 //    }
-
-    @Transactional
-    public MypageResponseDto updateMypage(MypageRequestDto mypagerequestDto, HttpServletRequest request, HttpServletResponse response) {
-        // token이 유효한지 확인
-        if (!jwtUtil.validateAllToken(request, response)) {
-            throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
-        }
-        // token에 email이 해당 이메일이 맞는지
-        String refresh = jwtUtil.substringToken(jwtUtil.getTokenFromRequest("Refresh", request));
-        String email = jwtUtil.getUserInfoFromToken(refresh).getSubject();
-        User user = userRepository.findByEmail(email).orElseThrow(
-                () -> new IllegalArgumentException("유저가 없습니다.")
-        );
-        // 맞다면 고쳐요
-        user.update(mypagerequestDto);
-        return new MypageResponseDto(user);
-    }
-
-    // 유저 정보 가져오기
-    public MypageResponseDto getInfo(HttpServletRequest request, HttpServletResponse response) {
-        if (!jwtUtil.validateAllToken(request, response)) {
-           throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
-        }
-        String refresh = jwtUtil.substringToken(jwtUtil.getTokenFromRequest("Refresh", request));
-        String email = jwtUtil.getUserInfoFromToken(refresh).getSubject();
-        User user = userRepository.findByEmail(email).orElseThrow(
-                () -> new IllegalArgumentException("유저가 없습니다.")
-        );
-        return new MypageResponseDto(user);
-    }
+    // --> 생성자에서 해결!
 }

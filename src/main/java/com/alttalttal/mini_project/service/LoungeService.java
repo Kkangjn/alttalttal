@@ -6,72 +6,57 @@ import com.alttalttal.mini_project.entity.LoungeEntity;
 import com.alttalttal.mini_project.entity.User;
 import com.alttalttal.mini_project.jwt.JwtUtil;
 import com.alttalttal.mini_project.repository.LoungeRepository;
-import com.alttalttal.mini_project.repository.UserRepository;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
 @Service
+@RequiredArgsConstructor
 public class LoungeService {
     private final LoungeRepository loungeRepository; // 생성자 주입
     private final JwtUtil jwtUtil;
-    private final UserRepository userRepository;
-
-    public LoungeService(LoungeRepository loungeRepository, JwtUtil jwtUtil, UserRepository userRepository){
-        this.loungeRepository = loungeRepository;
-        this.jwtUtil = jwtUtil;
-        this.userRepository = userRepository;
-    }
-
-
-    // repository 에 작성한 라운지를 저장한다.
-    public void createLounge(LoungeRequestDto loungeRequestDto, HttpServletRequest request, HttpServletResponse response) {
-        if (!jwtUtil.validateAllToken(request, response)) {
-            throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
-        }
-        String refresh = jwtUtil.substringToken(jwtUtil.getTokenFromRequest("Refresh", request));
-        String email = jwtUtil.getUserInfoFromToken(refresh).getSubject();
-        User user = userRepository.findByEmail(email).orElseThrow(
-                () -> new IllegalArgumentException("유저가 없습니다.")
-        );
-        LoungeEntity loungeEntity = new LoungeEntity(loungeRequestDto, user);
-//        loungeEntity.toSaveEntity(loungeRequestDto);
-        loungeRepository.save(loungeEntity);
-    }
+    private final ServiceManagerImpl serviceManager;
 
     // 라운지 목록 조회
     // repository 에서 라운지 entity 를 꺼낸 다음, Dto 로 변환하고 변환된 객체를 list 에 담는다.
     public List<LoungeResponseDto> getfindAll() {
-        List<LoungeEntity> loungeEntityList = loungeRepository.findAll(); // findAll 을 사용해서 repository 에서 데이터를 가져올 때는 entity로 가져온다.
-        List<LoungeResponseDto> loungeResponseDtoList = new ArrayList<>(); // 리턴할 객체를 선언한다.
-        for(LoungeEntity loungeEntity: loungeEntityList) { // LoungeEntityList 에 담긴 것을 LoungeRequestDtoList에 옮겨 담는다. 반복문을 돌린다.
-            loungeResponseDtoList.add(new LoungeResponseDto(loungeEntity));
+        return loungeRepository.findAll().stream().map(LoungeResponseDto::new).toList(); // findAll 을 사용해서 repository 에서 데이터를 가져올 때는 entity로 가져온다. // 가져온 entity를 Dto로 변환하고 List를 만들어서 반환
+    }
+
+    // repository 에 작성한 라운지를 저장한다.
+    public ResponseEntity<String> createLounge(LoungeRequestDto loungeRequestDto, String accessToken, String refreshToken, HttpServletResponse response) {
+        if (!jwtUtil.validateAllToken(accessToken, refreshToken, response)) {
+            throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
         }
-        return loungeResponseDtoList;
+
+        User user = serviceManager.getUserFromToken(refreshToken);
+
+        LoungeEntity loungeEntity = new LoungeEntity(loungeRequestDto, user);
+        loungeRepository.save(loungeEntity);
+        return ResponseEntity.ok("등록 완료");
     }
 
     // 라운지 삭제
-    public void deleteLounge(Long id, HttpServletRequest request, HttpServletResponse response) {
-        if (!jwtUtil.validateAllToken(request, response)) {
+    public ResponseEntity<String> deleteLounge(Long id, String accessToken, String refreshToken, HttpServletResponse response) {
+        if (!jwtUtil.validateAllToken(accessToken, refreshToken, response)) {
             throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
         }
-        String refresh = jwtUtil.substringToken(jwtUtil.getTokenFromRequest("Refresh", request));
-        String email = jwtUtil.getUserInfoFromToken(refresh).getSubject();
-        User user = userRepository.findByEmail(email).orElseThrow(
-                () -> new IllegalArgumentException("유저가 없습니다.")
-        );
+
+        Long userId = serviceManager.getUserIdFromToken(refreshToken);
 
         LoungeEntity loungeEntity = loungeRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("글이 없습니다.")
         );
-        if(loungeEntity.getUser().getId() != id)
+
+        if(loungeEntity.getUser().getId() != userId)
             throw new IllegalArgumentException("작성자가 아닙니다.");
 
         loungeRepository.delete(loungeEntity);
+        return ResponseEntity.ok("삭제 완료");
     }
 
 }

@@ -1,4 +1,4 @@
-package com.alttalttal.mini_project.Dto;
+package com.alttalttal.mini_project.dto;
 
 import com.alttalttal.mini_project.entity.LoungeEntity;
 import lombok.Getter;
@@ -10,11 +10,14 @@ public class LoungeResponseDto {
     private Long id;
     private String base;
     private String content;
+    private String nickname;
     private LocalDateTime createdAt;
 
     public LoungeResponseDto(LoungeEntity loungeEntity){
         this.id = loungeEntity.getId();
         this.base = loungeEntity.getBase();
         this.content = loungeEntity.getContent();
+        this.nickname = loungeEntity.getUser().getNickname();
+        this.createdAt = loungeEntity.getCreatedAt();
     }
 }

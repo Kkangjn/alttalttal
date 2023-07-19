@@ -2,10 +2,12 @@ package com.alttalttal.mini_project.controller;
 
 import com.alttalttal.mini_project.dto.LoungeResponseDto;
 import com.alttalttal.mini_project.dto.LoungeRequestDto;
+import com.alttalttal.mini_project.jwt.JwtUtil;
 import com.alttalttal.mini_project.service.LoungeService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 // import com.alttalttal.jwt.JwtUtil;
@@ -13,16 +15,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@CrossOrigin(exposedHeaders = "*")
 @RequiredArgsConstructor
 @RequestMapping("/lounge")
 public class LoungeController {
     private final LoungeService loungeService;
-
-    // 라운지 작성 요청받기.
-    @PostMapping()
-    public void createLounge(@RequestBody LoungeRequestDto loungeRequestDto, HttpServletRequest request, HttpServletResponse response) {
-        loungeService.createLounge(loungeRequestDto, request, response);
-    }
 
     // 라운지 페이지 불러오기. (라운지 리스트 조회)
     @GetMapping()
@@ -30,10 +27,16 @@ public class LoungeController {
         return loungeService.getfindAll();
     }
 
+    // 라운지 작성 요청받기.
+    @PostMapping()
+    public ResponseEntity<String> createLounge(@RequestBody LoungeRequestDto loungeRequestDto, @RequestHeader(JwtUtil.ACCESS_HEADER) String accessToken, @RequestHeader(JwtUtil.REFRESH_HEADER) String refreshToken, HttpServletResponse response) {
+        return loungeService.createLounge(loungeRequestDto, accessToken, refreshToken, response);
+    }
+
     // 라운지 글 삭제
     @DeleteMapping("/{id}")
-    public void deleteLounge(@PathVariable Long id, HttpServletRequest request, HttpServletResponse response) {
-        loungeService.deleteLounge(id ,request, response);
+    public ResponseEntity<String> deleteLounge(@PathVariable Long id, @RequestHeader(JwtUtil.ACCESS_HEADER) String accessToken, @RequestHeader(JwtUtil.REFRESH_HEADER) String refreshToken, HttpServletResponse response) {
+        return loungeService.deleteLounge(id ,accessToken, refreshToken, response);
     }
 }
 

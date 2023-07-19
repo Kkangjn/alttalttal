@@ -15,8 +15,9 @@ public class RecipeResponseDto {
     private List<MakingDetailResponseDto> makingDetailList;
     private Boolean isUserZzim;
     private Integer countZzim;
+    private String imageUrl;
 
-    public RecipeResponseDto(MongoRecipe recipe, Boolean isUserZzim, Integer countZzim){
+    public RecipeResponseDto(MongoRecipe recipe, Boolean isUserZzim, Integer countZzim) {
         this.recipeId = recipe.getRecipeId();
         this.name = recipe.getName();
         this.explanation = recipe.getExplanation();
@@ -25,5 +26,6 @@ public class RecipeResponseDto {
         this.makingDetailList = recipe.getMakingDetailList().stream().map(MakingDetailResponseDto::new).toList();
         this.isUserZzim = isUserZzim;
         this.countZzim = countZzim;
+        this.imageUrl = "http://localhost:8080/images/" + recipe.getRecipeId() + ".png";
     }
 }

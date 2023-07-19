@@ -9,9 +9,12 @@ import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -22,6 +25,7 @@ import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
 
+@Slf4j
 @Component
 public class JwtUtil {
     private final UserRepository userRepository;
@@ -90,13 +94,17 @@ public class JwtUtil {
     // JWT Cookie에 저장
     public void addJwtToCookie(String token, String tokenValue, HttpServletResponse res){
         try{
+            log.info("쿠키주입성공");
             token = URLEncoder.encode(token, "utf-8").replaceAll("\\+", "%20");
 
-            Cookie cookie = new Cookie(tokenValue, token);
-            cookie.setPath("/");
+            ResponseCookie cookie = ResponseCookie.from(tokenValue, token)
+                    .path("/")
+                    .sameSite("")
+                    .httpOnly(false)
+                    .secure(true)
+                    .build();
 
-            // Response 객체에 Cookie 추가
-            res.addCookie(cookie);
+            res.addHeader("Set-Cookie", cookie.toString());
         }catch (UnsupportedEncodingException e){
             logger.error(e.getMessage());
         }
@@ -147,10 +155,7 @@ public class JwtUtil {
     }
 
 
-    public boolean validateAllToken(HttpServletRequest request, HttpServletResponse response) {
-        // HttpServlet에서 쿠키 가져와 JWT 토큰 꺼내
-        String accessToken = getTokenFromRequest(ACCESS_HEADER, request);
-        String refreshToken = getTokenFromRequest(REFRESH_HEADER, request);
+    public boolean validateAllToken(String accessToken, String refreshToken, HttpServletResponse response) {
 
         // 쿠키에서 JWT 토큰 자르기
         accessToken = substringToken(accessToken);
@@ -163,10 +168,11 @@ public class JwtUtil {
                 boolean validateRefreshToken = validateToken(refreshToken); // refresh token 검증
                 boolean isRefreshToken = existsRefreshToken(refreshToken); // refresh token DB 존재
                 if(validateRefreshToken && isRefreshToken){
-                    String email = getUserInfoFromToken(refreshToken).getSubject();
+                    String email = getUserInfoFromToken(substringToken(refreshToken)).getSubject();
                     UserRoleEnum role = getRoles(email);
                     String newAccessToken = createAccessToken(email, role);
-                    addJwtToCookie(newAccessToken, ACCESS_HEADER, response);
+                    response.addHeader(JwtUtil.ACCESS_HEADER, newAccessToken);
+
                     return true;
                 }
                 return false;
@@ -197,5 +203,11 @@ public class JwtUtil {
                 .getExpiration();
         Long now = new Date().getTime();
         return expiration.getTime() - now;
+    }
+
+    public String getEmailFromToken(String token){
+        String subToken = substringToken(token);
+        Claims info = getUserInfoFromToken(subToken);
+        return info.getSubject();
     }
 }

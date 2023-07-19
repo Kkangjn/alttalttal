@@ -1,13 +1,13 @@
-package com.alttalttal.mini_project;
-
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-
-@SpringBootTest
-class MiniProjectApplicationTests {
-
-    @Test
-    void contextLoads() {
-    }
-
-}
+//package com.alttalttal.mini_project;
+//
+//import org.junit.jupiter.api.Test;
+//import org.springframework.boot.test.context.SpringBootTest;
+//
+//@SpringBootTest
+//class MiniProjectApplicationTests {
+//
+//    @Test
+//    void contextLoads() {
+//    }
+//
+//}

@@ -2,6 +2,7 @@ package com.alttalttal.mini_project.entity;
 
 import com.alttalttal.mini_project.entity.recipe_component.Ingredient;
 import com.alttalttal.mini_project.entity.recipe_component.MakingDetail;
+import com.alttalttal.mini_project.entity.recipe_component.Zzim;
 import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,4 +22,5 @@ public class MongoRecipe {
     private String explanation;
     private List<Ingredient> ingredientList;
     private List<MakingDetail> makingDetailList;
+    private List<Zzim> zzimUserIdList;
 }
