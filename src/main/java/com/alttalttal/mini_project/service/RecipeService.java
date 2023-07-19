@@ -52,7 +52,7 @@ public class RecipeService {
                 // token에 email로 user가져와서 userId로 찜 확인
                 Long userId = serviceManager.getUserIdFromToken(refreshToken);
                 isUserZzim = recipe.getZzimUserIdList().stream().anyMatch(zzim -> zzim.getUserId()==userId);
-            }
+            }else isUserZzim = false;
         }
 
         // 이미지가 없으면 default 이미지로 보내기

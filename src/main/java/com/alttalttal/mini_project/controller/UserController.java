@@ -36,9 +36,10 @@ public class UserController {
     }
 
     @GetMapping("/logout")
-    public ResponseEntity<MessageResponseDto> logoutUser(HttpServletRequest request){
-        return userService.logoutUser(request);
+    public ResponseEntity<MessageResponseDto> logoutUser(@RequestHeader(JwtUtil.ACCESS_HEADER) String accessToken, @RequestHeader(JwtUtil.REFRESH_HEADER) String refreshToken){
+        return userService.logoutUser(accessToken, refreshToken);
     }
+
     @GetMapping("/test")
     public void test(@RequestHeader(JwtUtil.ACCESS_HEADER) String accessToken, @RequestHeader(JwtUtil.REFRESH_HEADER) String refreshToken, HttpServletResponse response){
         userService.test(accessToken, refreshToken, response);

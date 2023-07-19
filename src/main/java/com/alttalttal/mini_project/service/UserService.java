@@ -101,15 +101,10 @@ public class UserService {
         else System.out.println("실패");
     }
 
-    public ResponseEntity<MessageResponseDto> logoutUser(HttpServletRequest request) {
-        String accessToken = jwtUtil.getTokenFromRequest("Access", request);
-        String refresh = jwtUtil.getTokenFromRequest("Refresh", request);
+    public ResponseEntity<MessageResponseDto> logoutUser(String accessToken, String refreshToken) {
         Long expiration = jwtUtil.getExpiration(jwtUtil.substringToken(accessToken));
-//        String email = jwtUtil.getUserInfoFromToken(jwtUtil.substringToken(accessToken)).getSubject();
 
-        System.out.println("refresh = " + refresh);
-
-        if(!redisService.delValues(refresh)) {
+        if(!redisService.delValues(refreshToken)) {
             throw new IllegalArgumentException("삭제되지 않았습니다.");
         }
 
