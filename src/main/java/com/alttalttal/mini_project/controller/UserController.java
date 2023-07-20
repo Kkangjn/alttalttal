@@ -6,10 +6,8 @@ import com.alttalttal.mini_project.dto.SignUpRequestDto;
 import com.alttalttal.mini_project.dto.UserInfoResponseDto;
 import com.alttalttal.mini_project.jwt.JwtUtil;
 import com.alttalttal.mini_project.service.UserService;
-import io.jsonwebtoken.Jws;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,13 +34,10 @@ public class UserController {
     }
 
     @GetMapping("/logout")
-    public ResponseEntity<MessageResponseDto> logoutUser(HttpServletRequest request){
-        return userService.logoutUser(request);
+    public ResponseEntity<MessageResponseDto> logoutUser(@RequestHeader(JwtUtil.ACCESS_HEADER) String accessToken, @RequestHeader(JwtUtil.REFRESH_HEADER) String refreshToken){
+        return userService.logoutUser(accessToken, refreshToken);
     }
-    @GetMapping("/test")
-    public void test(@RequestHeader(JwtUtil.ACCESS_HEADER) String accessToken, @RequestHeader(JwtUtil.REFRESH_HEADER) String refreshToken, HttpServletResponse response){
-        userService.test(accessToken, refreshToken, response);
-    }
+
 
     @GetMapping("/info")
     public UserInfoResponseDto userInfo(HttpServletRequest request, HttpServletResponse response){

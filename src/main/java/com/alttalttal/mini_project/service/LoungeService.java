@@ -2,14 +2,16 @@ package com.alttalttal.mini_project.service;
 
 import com.alttalttal.mini_project.dto.LoungeRequestDto;
 import com.alttalttal.mini_project.dto.LoungeResponseDto;
-import com.alttalttal.mini_project.entity.LoungeEntity;
+import com.alttalttal.mini_project.dto.LoungeEntity;
 import com.alttalttal.mini_project.entity.User;
 import com.alttalttal.mini_project.jwt.JwtUtil;
 import com.alttalttal.mini_project.repository.LoungeRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import com.alttalttal.mini_project.dto.MessageResponseDto;
 
 import java.util.List;
 
@@ -28,7 +30,7 @@ public class LoungeService {
     }
 
     // repository 에 작성한 라운지를 저장한다.
-    public ResponseEntity<String> createLounge(LoungeRequestDto loungeRequestDto, String accessToken, String refreshToken, HttpServletResponse response) {
+    public ResponseEntity<MessageResponseDto> createLounge(LoungeRequestDto loungeRequestDto, String accessToken, String refreshToken, HttpServletResponse response) {
         if (!jwtUtil.validateAllToken(accessToken, refreshToken, response)) {
             throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
         }
@@ -37,11 +39,11 @@ public class LoungeService {
 
         LoungeEntity loungeEntity = new LoungeEntity(loungeRequestDto, user);
         loungeRepository.save(loungeEntity);
-        return ResponseEntity.ok("등록 완료");
+        return new ResponseEntity<>(new MessageResponseDto("등록완료!" , HttpStatus.OK.toString()), HttpStatus.OK);
     }
 
     // 라운지 삭제
-    public ResponseEntity<String> deleteLounge(Long id, String accessToken, String refreshToken, HttpServletResponse response) {
+    public ResponseEntity<MessageResponseDto> deleteLounge(Long id, String accessToken, String refreshToken, HttpServletResponse response) {
         if (!jwtUtil.validateAllToken(accessToken, refreshToken, response)) {
             throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
         }
@@ -56,7 +58,7 @@ public class LoungeService {
             throw new IllegalArgumentException("작성자가 아닙니다.");
 
         loungeRepository.delete(loungeEntity);
-        return ResponseEntity.ok("삭제 완료");
+        return new ResponseEntity<>(new MessageResponseDto("삭제 완료!" , HttpStatus.OK.toString()), HttpStatus.OK);
     }
 
 }

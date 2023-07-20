@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -116,7 +115,7 @@ public class JwtUtil {
             return tokenValue.substring(7);
         }
         logger.error("Not Found Token");
-        throw new NullPointerException("Not Found Token");
+        throw new IllegalArgumentException("Not Found Token");
     }
 
     // HttpServletRequest 에서 Cookie Value : JWT 가져오기
@@ -141,7 +140,7 @@ public class JwtUtil {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
-        } catch (SecurityException | MalformedJwtException e) {
+        } catch (SecurityException | MalformedJwtException |io.jsonwebtoken.security.SignatureException e) {
             logger.error("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
         } catch (ExpiredJwtException e) {
             logger.error("Expired JWT token, 만료된 JWT token 입니다.");
@@ -157,18 +156,17 @@ public class JwtUtil {
 
     public boolean validateAllToken(String accessToken, String refreshToken, HttpServletResponse response) {
 
-        // 쿠키에서 JWT 토큰 자르기
         accessToken = substringToken(accessToken);
         refreshToken = substringToken(refreshToken);
 
         if(accessToken != null){ // accessToken 비어있지 않고
-            if(validateToken(accessToken) && redisService.getValue(accessToken) == null){
+            if(validateToken(accessToken) && redisService.getValue(accessToken) == null){ // access 검증, 로그아웃하지 않았다
                 return true;
             }else if(!validateToken(accessToken) && refreshToken != null){ //검증은 안되는데 refresh 토큰이 값이 있어
                 boolean validateRefreshToken = validateToken(refreshToken); // refresh token 검증
                 boolean isRefreshToken = existsRefreshToken(refreshToken); // refresh token DB 존재
                 if(validateRefreshToken && isRefreshToken){
-                    String email = getUserInfoFromToken(substringToken(refreshToken)).getSubject();
+                    String email = getUserInfoFromToken(refreshToken).getSubject();
                     UserRoleEnum role = getRoles(email);
                     String newAccessToken = createAccessToken(email, role);
                     response.addHeader(JwtUtil.ACCESS_HEADER, newAccessToken);

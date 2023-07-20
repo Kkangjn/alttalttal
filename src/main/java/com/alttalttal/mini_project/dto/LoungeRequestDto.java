@@ -1,10 +1,6 @@
 package com.alttalttal.mini_project.dto;
 
-import com.alttalttal.mini_project.entity.LoungeEntity;
 import lombok.*;
-
-import java.time.LocalDateTime;
-
 
 @Getter
 @Setter
@@ -16,3 +12,4 @@ public class LoungeRequestDto { // 로그인 상태에서 작성하기 때문에
     private String base;
     private String content;
 }
+

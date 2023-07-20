@@ -1,6 +1,5 @@
 package com.alttalttal.mini_project.dto;
 
-import com.alttalttal.mini_project.entity.LoungeEntity;
 import lombok.Getter;
 
 import java.time.LocalDateTime;

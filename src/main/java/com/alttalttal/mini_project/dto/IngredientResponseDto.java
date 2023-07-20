@@ -13,13 +13,3 @@ public class IngredientResponseDto {
         this.amount = ingredient.getAmount();
     }
 }
-
-//    @JsonSerialize(using = CustomSerializer.class)
-//    public String getname() {
-//        return name;
-//    }
-//
-//    @JsonSerialize(using = CustomSerializer.class)
-//    public String getAmount() {
-//        return amount;
-//    }
