@@ -1,6 +1,6 @@
 package com.alttalttal.mini_project.repository;
 
-import com.alttalttal.mini_project.entity.LoungeEntity;
+import com.alttalttal.mini_project.dto.LoungeEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface LoungeRepository extends JpaRepository<LoungeEntity, Long> {

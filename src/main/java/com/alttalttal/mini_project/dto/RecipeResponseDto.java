@@ -26,6 +26,6 @@ public class RecipeResponseDto {
         this.makingDetailList = recipe.getMakingDetailList().stream().map(MakingDetailResponseDto::new).toList();
         this.isUserZzim = isUserZzim;
         this.countZzim = countZzim;
-        this.imageUrl = "http://localhost:8080/images/" + recipe.getRecipeId() + ".png";
+        this.imageUrl = "https://43.201.127.107:8080/images/" + recipe.getRecipeId() + ".png";
     }
 }

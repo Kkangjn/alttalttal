@@ -13,7 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -42,8 +42,12 @@ public class UserService {
 
         // 회원 중복 확인
         Optional<User> checkUsername = userRepository.findByEmail(email);
+        Optional<User> checkNickname = userRepository.findByNickname(nickname);
         if(checkUsername.isPresent()){
-            throw new IllegalArgumentException("중복된 username 입니다.");
+            throw new IllegalArgumentException("중복된 email 입니다.");
+        }
+        if(checkNickname.isPresent()){
+            throw new IllegalArgumentException("중복된 nickname 입니다.");
         }
 
         // ADMIN KEY를 통해 권한부여 결정
@@ -84,25 +88,18 @@ public class UserService {
         log.info("acessToken = {}", acessToken);
         log.info("refreshToken = {}", refreshToken);
 
-//        jwtUtil.addJwtToCookie(acessToken, jwtUtil.ACCESS_HEADER, res);
-//        jwtUtil.addJwtToCookie(refreshToken,jwtUtil.REFRESH_HEADER, res);
-
         res.addHeader(JwtUtil.ACCESS_HEADER, acessToken);
         res.addHeader(JwtUtil.REFRESH_HEADER, refreshToken);
 
 
         // Refresh Token 저장
-        redisService.setValues(jwtUtil.substringToken(refreshToken), user.getEmail(), 60 * 30 * 100L);
+        redisService.setValues(jwtUtil.substringToken(refreshToken), user.getEmail(), 60 * 60 * 24 * 30 * 1000L);
         return new ResponseEntity<>(new MessageResponseDto("로그인 성공!", HttpStatus.OK.toString()), HttpStatus.OK);
     }
 
-    public void test(String accessToken, String refreshToken, HttpServletResponse response) {
-        if(jwtUtil.validateAllToken(accessToken, refreshToken, response)) System.out.println("성공");
-        else System.out.println("실패");
-    }
 
     public ResponseEntity<MessageResponseDto> logoutUser(String accessToken, String refreshToken) {
-        Long expiration = jwtUtil.getExpiration(jwtUtil.substringToken(accessToken));
+        Long expiration = jwtUtil.getExpiration(jwtUtil.substringToken(refreshToken));
 
         if(!redisService.delValues(refreshToken)) {
             throw new IllegalArgumentException("삭제되지 않았습니다.");

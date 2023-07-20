@@ -2,10 +2,15 @@ package com.alttalttal.mini_project.service;
 
 import com.alttalttal.mini_project.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.TimeUnit;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RedisService {
@@ -15,7 +20,9 @@ public class RedisService {
     // key-value 설정
     public void setValues(String token, String email, Long expiration){
         ValueOperations<String, String> values = redisTemplate.opsForValue();
-        values.set(token, email, expiration);
+        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(token.getClass()));
+
+        values.set(token, email, expiration, TimeUnit.MILLISECONDS);
     }
 
     // key-value 가져오기

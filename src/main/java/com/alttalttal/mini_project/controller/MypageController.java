@@ -1,8 +1,8 @@
 package com.alttalttal.mini_project.controller;
 
+import com.alttalttal.mini_project.dto.MypageRequestDto;
 import com.alttalttal.mini_project.dto.MypageResponseDto;
 import com.alttalttal.mini_project.jwt.JwtUtil;
-import com.alttalttal.mini_project.dto.MypageRequestDto;
 import com.alttalttal.mini_project.service.MypageService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

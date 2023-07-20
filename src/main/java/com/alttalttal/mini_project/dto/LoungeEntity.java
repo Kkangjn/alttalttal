@@ -1,6 +1,8 @@
-package com.alttalttal.mini_project.entity;
+package com.alttalttal.mini_project.dto;
 
-import com.alttalttal.mini_project.dto.LoungeRequestDto;
+
+import com.alttalttal.mini_project.entity.Timestamped;
+import com.alttalttal.mini_project.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -40,42 +42,6 @@ public class LoungeEntity extends Timestamped { // LoungeEntity 가 TimeEntity �
 }
 
 
-
-//@Entity
-//@Builder
-//@Getter
-//@Table(name = "comments")
-//@NoArgsConstructor
-//@AllArgsConstructor // 자동으로 생성된다
-//lounges extends Time{
-//
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    private Long id;
-//
-//    // columnDefinition 컬럼을 text로 설정해 데이터 추출
-//    @Column(columnDefinition = "TEXT", nullable = false)
-//    private String lounge; // 댓글 내용
-//
-//    @ManyToOne
-//    @JoinColumn(name = "lounge_id")
-//    private Lounge lounge;
-//
-//    @ManyToOne
-//    @JoinColumn(name = "user_id")
-//    private User user;
-//
-//    public lounges(LoungeRequestDto loungeRequestDto, Lounge lounge, User user) {
-//        this.lounge = loungeRequestDto.getlounge();
-//        this.lounge = lounge;
-//        this.user = user;
-//    }
-//
-//    // 댓글 수정 메서드
-//    public void update(LoungeRequestDto requestDto){
-//        this.lounge =requestDto.getlounge();
-//    }
-//}
 
 
 

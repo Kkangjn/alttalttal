@@ -17,6 +17,6 @@ public class simpleRecipesResponseDto {
         this.name = recipe.getName();
         this.explanation = recipe.getExplanation();
         this.base = recipe.getBase();
-        this.imageUrl = "http://localhost:8080/images/" + recipe.getRecipeId() + ".png";
+        this.imageUrl = "https://43.201.127.107:8080/images/" + recipe.getRecipeId() + ".png";
     }
 }

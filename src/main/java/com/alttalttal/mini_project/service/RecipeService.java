@@ -1,5 +1,6 @@
 package com.alttalttal.mini_project.service;
 
+import com.alttalttal.mini_project.dto.MessageResponseDto;
 import com.alttalttal.mini_project.dto.RecipeResponseDto;
 import com.alttalttal.mini_project.dto.simpleRecipesResponseDto;
 import com.alttalttal.mini_project.entity.MongoRecipe;
@@ -15,6 +16,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -55,38 +57,28 @@ public class RecipeService {
             }else isUserZzim = false;
         }
 
-        // 이미지가 없으면 default 이미지로 보내기
-//        String imagePath = "file:src/main/resources/images/" + recipe.getRecipeId() + ".png";
-//        Resource imageResource;
-//        try{
-//            imageResource = new UrlResource(imagePath);
-//        }catch (MalformedURLException e){
-//            String defaultImageUrl = "http://localhost:8080/images/noimage.png";
-//            return new RecipeResponseDto(recipe, isUserZzim, countZzim, defaultImageUrl);
-//        }
-
-//        String imageUrl = "http://localhost:8080/images/" + recipe.getRecipeId() + ".png";
-
         return new RecipeResponseDto(recipe, isUserZzim, countZzim);
     }
 
-    public ResponseEntity<String> createZzim(Long recipeId, String accessToken, String refreshToken, HttpServletResponse response) {
+    public ResponseEntity<MessageResponseDto> createZzim(Long recipeId, String accessToken, String refreshToken, HttpServletResponse response) {
         if(!jwtUtil.validateAllToken(accessToken, refreshToken, response)){
             throw new IllegalArgumentException("잘못된 토큰입니다.");
         }
         Long userId = serviceManager.getUserIdFromToken(refreshToken);
+
         // 검증을 추가(이미 찜한 상태인지 확인)
         if(mongoRecipeRepository.existsByRecipeIdAndZzimUserIdListUserId(recipeId,userId)){
-            throw new IllegalArgumentException("잘못된 접근입니다.");
+            throw new IllegalArgumentException("이미 찜이 된 상태입니다.");
         }
+
         Query query = new Query(Criteria.where("recipeId").is(recipeId));
         Update update = new Update().push("zzimUserIdList", new BasicDBObject("userId", userId));
         mongoTemplate.updateFirst(query, update, MongoRecipe.class);
 
-        return ResponseEntity.ok("찜 성공");
+        return new ResponseEntity<>(new MessageResponseDto("찜 성공!" , HttpStatus.OK.toString()), HttpStatus.OK);
     }
 
-    public ResponseEntity<String> deleteZzim(Long recipeId, String accessToken, String refreshToken, HttpServletResponse response) {
+    public ResponseEntity<MessageResponseDto> deleteZzim(Long recipeId, String accessToken, String refreshToken, HttpServletResponse response) {
         if(!jwtUtil.validateAllToken(accessToken, refreshToken, response)){
             throw new IllegalArgumentException("잘못된 토큰입니다.");
         }
@@ -98,6 +90,6 @@ public class RecipeService {
         Update update = new Update().pull("zzimUserIdList", new BasicDBObject("userId", userId));
         mongoTemplate.updateFirst(query, update, MongoRecipe.class);
 
-        return ResponseEntity.ok("찜 삭제");
+        return new ResponseEntity<>(new MessageResponseDto("찜 삭제 성공!" , HttpStatus.OK.toString()), HttpStatus.OK);
     }
 }
