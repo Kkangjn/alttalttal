@@ -11,7 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/users")
+@RequestMapping("/api")
 @CrossOrigin(exposedHeaders = "*")
 @RestController
 public class UserController {
@@ -23,23 +23,23 @@ public class UserController {
 
     }
 
-    @PostMapping("/signup")
+    @PostMapping("/users/signup")
     public ResponseEntity<MessageResponseDto> createUser(@RequestBody SignUpRequestDto signUpRequestDto) {
         return userService.createUser(signUpRequestDto);
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<MessageResponseDto> loginUser(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response){
-        return userService.loginUser(loginRequestDto, response);
-    }
+//    @PostMapping("/users/login")
+//    public ResponseEntity<MessageResponseDto> loginUser(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response){
+//        return userService.loginUser(loginRequestDto, response);
+//    }
 
-    @GetMapping("/logout")
+    @GetMapping("/users/logout")
     public ResponseEntity<MessageResponseDto> logoutUser(@RequestHeader(JwtUtil.ACCESS_HEADER) String accessToken, @RequestHeader(JwtUtil.REFRESH_HEADER) String refreshToken){
         return userService.logoutUser(accessToken, refreshToken);
     }
 
 
-    @GetMapping("/info")
+    @GetMapping("/users/info")
     public UserInfoResponseDto userInfo(HttpServletRequest request, HttpServletResponse response){
         return userService.userInfo(request, response);
     }

@@ -66,38 +66,6 @@ public class UserService {
         return new ResponseEntity<>(new MessageResponseDto("회원가입 성공!" , HttpStatus.OK.toString()), HttpStatus.OK);
     }
 
-
-    public ResponseEntity<MessageResponseDto> loginUser(@RequestBody LoginRequestDto requestDto, HttpServletResponse res) {
-        String email = requestDto.getEmail();
-        String password = requestDto.getPassword();
-
-        // 사용자 확인
-        User user = userRepository.findByEmail(email).orElseThrow(
-                () -> new IllegalArgumentException("회원을 찾을 수 없습니다.")
-        );
-        log.info("user = {}", user.getId());
-        // 비밀번호 확인
-        if(!passwordEncoder.matches(password, user.getPassword())){
-            throw new IllegalArgumentException("비밀번호가 틀렸습니다.");
-        }
-        log.info("email = {}", user.getEmail());
-
-        // JWT 생성
-        String acessToken = jwtUtil.createAccessToken(user.getEmail(), user.getRole());
-        String refreshToken = jwtUtil.createRefreshToken(user.getEmail(), user.getRole());
-        log.info("acessToken = {}", acessToken);
-        log.info("refreshToken = {}", refreshToken);
-
-        res.addHeader(JwtUtil.ACCESS_HEADER, acessToken);
-        res.addHeader(JwtUtil.REFRESH_HEADER, refreshToken);
-
-
-        // Refresh Token 저장
-        redisService.setValues(jwtUtil.substringToken(refreshToken), user.getEmail(), 60 * 60 * 24 * 30 * 1000L);
-        return new ResponseEntity<>(new MessageResponseDto("로그인 성공!", HttpStatus.OK.toString()), HttpStatus.OK);
-    }
-
-
     public ResponseEntity<MessageResponseDto> logoutUser(String accessToken, String refreshToken) {
         Long expiration = jwtUtil.getExpiration(jwtUtil.substringToken(refreshToken));
 

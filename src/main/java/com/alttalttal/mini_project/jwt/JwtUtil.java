@@ -112,7 +112,7 @@ public class JwtUtil {
     // 받아온 Cookie의 Value인 JWT 토큰 substring
     public String substringToken(String tokenValue){
         if(StringUtils.hasText(tokenValue) && tokenValue.startsWith(BEARER_PREFIX)){
-            return tokenValue.substring(7);
+            return tokenValue.substring("Bearer ".length());
         }
         logger.error("Not Found Token");
         throw new IllegalArgumentException("Not Found Token");
@@ -131,6 +131,24 @@ public class JwtUtil {
                     }
                 }
             }
+        }
+        return null;
+    }
+
+    // header 에서 Access JWT 가져오기
+    public String getAccessJwtFromHeader(HttpServletRequest request) {
+        String bearerToken = request.getHeader(ACCESS_HEADER);
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
+            return bearerToken;
+        }
+        return null;
+    }
+
+    // header 에서 Refresh JWT 가져오기
+    public String getRefreshJwtFromHeader(HttpServletRequest request) {
+        String bearerToken = request.getHeader(REFRESH_HEADER);
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
+            return bearerToken;
         }
         return null;
     }
@@ -155,9 +173,8 @@ public class JwtUtil {
 
 
     public boolean validateAllToken(String accessToken, String refreshToken, HttpServletResponse response) {
-
-        accessToken = substringToken(accessToken);
-        refreshToken = substringToken(refreshToken);
+        accessToken = accessToken.substring("Bearer ".length());
+        refreshToken = refreshToken.substring("Bearer ".length());
 
         if(accessToken != null){ // accessToken 비어있지 않고
             if(validateToken(accessToken) && redisService.getValue(accessToken) == null){ // access 검증, 로그아웃하지 않았다
