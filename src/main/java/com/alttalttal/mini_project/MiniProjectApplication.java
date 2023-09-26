@@ -11,8 +11,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @EnableJpaAuditing
 @SpringBootApplication(exclude = SecurityAutoConfiguration.class)
 // mysql repository와 mongodb repository의 package로 나눔
-@EnableJpaRepositories(basePackages = "com.alttalttal.mini_project.repository")
-@EnableMongoRepositories(basePackages = "com.alttalttal.mini_project.mongo.repository")
+
 public class MiniProjectApplication {
 
     public static void main(String[] args) {
